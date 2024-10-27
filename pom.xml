@@ -6,7 +6,7 @@
 
     <groupId>de.MCmoderSD</groupId>
     <artifactId>executor</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 
     <name>ExecutorUtility</name>
     <description>A simple utility with scheduled executors</description>
@@ -20,18 +20,10 @@
     </distributionManagement>
 
     <properties>
-        <gpg.skip>true</gpg.skip>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-
-    <repositories>
-        <repository>
-            <id>ExecutorUtility</id>
-            <url>https://maven.pkg.github.com/MCmoderSD/ExecutorUtility</url>
-        </repository>
-    </repositories>
 
     <build>
         <plugins>
