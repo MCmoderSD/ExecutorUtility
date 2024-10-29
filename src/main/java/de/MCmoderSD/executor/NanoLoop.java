@@ -3,130 +3,169 @@ package de.MCmoderSD.executor;
 import java.util.concurrent.TimeUnit;
 
 /**
- * NanoLoop is a utility class that allows scheduling of tasks to run at a specified interval
- * with precision down to nanoseconds. This loop can be started, stopped, and modified in real-time.
+ * A utility class for creating a precise loop that executes a given task
+ * at a specified frequency, adjustable with a modifier.
  */
 @SuppressWarnings("ALL")
 public class NanoLoop {
+
+    // Thread Loop
+    private final Runnable loop;
 
     // Flags
     private volatile boolean running;
 
     // Attributes
-    private Runnable task;
     private Thread thread;
     private long intervalNanos;
 
     // Variables
+    private Runnable task;
     private long period;
     private float modifier;
 
     /**
-     * Constructs a NanoLoop with a specified task and frequency.
+     * Constructs a NanoLoop with the specified task and frequency.
      *
-     * @param task      the task to be executed in the loop
-     * @param frequency the frequency in Hz at which to run the task
+     * @param task      the Runnable task to execute
+     * @param frequency the frequency in Hz
      */
     public NanoLoop(Runnable task, long frequency) {
         this(task, 1_000_000_000 / frequency, TimeUnit.NANOSECONDS, 1);
     }
 
     /**
-     * Constructs a NanoLoop with a specified task, frequency, and modifier.
+     * Constructs a NanoLoop with the specified task, frequency, and modifier.
      *
-     * @param task      the task to be executed in the loop
-     * @param frequency the frequency in Hz at which to run the task
-     * @param modifier  a multiplier to adjust the task execution interval
+     * @param task      the Runnable task to execute
+     * @param frequency the frequency in Hz
+     * @param modifier  a modifier to adjust the execution period
      */
     public NanoLoop(Runnable task, long frequency, float modifier) {
         this(task, 1_000_000_000 / frequency, TimeUnit.NANOSECONDS, modifier);
     }
 
     /**
-     * Constructs a NanoLoop with a specified task, period, and time unit.
+     * Constructs a NanoLoop with the specified task and period in the given time unit.
      *
-     * @param task     the task to be executed in the loop
-     * @param period   the interval period between executions of the task
-     * @param timeUnit the time unit of the period
+     * @param task      the Runnable task to execute
+     * @param period    the period for task execution
+     * @param timeUnit  the TimeUnit of the specified period
      */
     public NanoLoop(Runnable task, long period, TimeUnit timeUnit) {
         this(task, period, timeUnit, 1);
     }
 
     /**
-     * Constructs a NanoLoop with a specified task, period, time unit, and modifier.
+     * Constructs a NanoLoop with the specified task, period, time unit, and modifier.
      *
-     * @param task     the task to be executed in the loop
-     * @param period   the interval period between executions of the task
-     * @param timeUnit the time unit of the period
-     * @param modifier a multiplier to adjust the task execution interval
+     * @param task      the Runnable task to execute
+     * @param period    the period for task execution
+     * @param timeUnit  the TimeUnit of the specified period
+     * @param modifier  a modifier to adjust the execution period
      */
     public NanoLoop(Runnable task, long period, TimeUnit timeUnit, float modifier) {
+
+        // Init Variables
         this.task = task;
         this.period = period;
-        this.intervalNanos = timeUnit.toNanos(period);
         this.modifier = modifier;
-        this.running = false;
-    }
 
-    /**
-     * Starts the execution loop. If already running, this method does nothing.
-     */
-    public void start() {
-        if (running) return;
-        running = true;
+        // Init Attributes
+        intervalNanos = timeUnit.toNanos(period);
+        running = false;
 
-        thread = new Thread(() -> {
+        // Create the loop
+        loop = () -> {
+
+            // Calculate the next execution time
             var nextTime = System.nanoTime();
+            while (running) { // Loop until stopped
 
-            while (running) {
-                var now = System.nanoTime();
-
-                if (now >= nextTime) {
+                // Execute the task if the next time has been reached
+                if (System.nanoTime() >= nextTime) {
                     task.run();
                     nextTime += intervalNanos;
                 }
 
+                // Sleep until the next execution time
                 var sleepTime = (nextTime - System.nanoTime()) / 1_000_000;
                 if (sleepTime > 0) {
                     try {
                         Thread.sleep(sleepTime);
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
-                        System.err.println("Thread was interrupted");
                         break;
                     }
                 }
             }
-        });
+        };
+    }
 
+    /**
+     * Starts the NanoLoop. If it's already running, it does nothing.
+     */
+    public void start() {
+
+        // Return if the loop is already running
+        if (running) return;
+
+        // Set the running flag to true
+        running = true;
+
+        // Create a new thread for the loop
+        thread = new Thread(loop);
+
+        // Start the thread
         thread.start();
     }
 
     /**
-     * Stops the execution loop and interrupts the running thread if active.
+     * Stops the NanoLoop. It sets the running flag to false and interrupts the thread.
      */
     public void stop() {
+
+        // Set the running flag to false
         running = false;
+
+        // Interrupt the thread
         if (thread != null) thread.interrupt();
     }
 
     /**
-     * Updates the period of the loop's execution interval.
+     * Sets a new task for the NanoLoop.
      *
-     * @param period   the new interval period between executions of the task
-     * @param timeUnit the time unit of the new period
+     * @param task the Runnable task to execute
      */
-    public void setPeriod(long period, TimeUnit timeUnit) {
-        this.period = period;
-        var interval = Math.round(period / modifier);
-        intervalNanos = timeUnit.toNanos(interval);
+    public void setTask(Runnable task) {
+        this.task = task;
     }
 
     /**
-     * Sets a modifier to adjust the interval period dynamically.
+     * Sets a new frequency for the NanoLoop.
      *
-     * @param modifier a new multiplier to adjust the task execution interval
+     * @param frequency the frequency in Hz
+     */
+    public void setPeriod(long frequency) {
+        this.period = 1_000_000_000 / frequency;
+        intervalNanos = 1_000_000_000 / Math.round(period / modifier);
+    }
+
+    /**
+     * Sets a new period for the NanoLoop in the specified time unit.
+     *
+     * @param period    the period for task execution
+     * @param timeUnit  the TimeUnit of the specified period
+     */
+    public void setPeriod(long period, TimeUnit timeUnit) {
+        this.period = period;
+        intervalNanos = timeUnit.toNanos(Math.round(period / modifier));
+    }
+
+    /**
+     * Sets a new modifier for the NanoLoop.
+     *
+     * @param modifier the new modifier value
      */
     public void setModifier(float modifier) {
         this.modifier = modifier;
@@ -141,45 +180,36 @@ public class NanoLoop {
     }
 
     /**
-     * Sets a new task to be executed by the loop.
+     * Checks if the NanoLoop is currently running.
      *
-     * @param task the new task to be executed in the loop
-     */
-    public void setTask(Runnable task) {
-        this.task = task;
-    }
-
-    /**
-     * Checks if the loop is currently running.
-     *
-     * @return {@code true} if the loop is running, {@code false} otherwise
+     * @return true if running, false otherwise
      */
     public boolean isRunning() {
         return running;
     }
 
     /**
-     * Gets the current interval period between task executions.
+     * Gets the current period of the NanoLoop.
      *
-     * @return the interval period
+     * @return the current period in nanoseconds
      */
     public long getPeriod() {
         return period;
     }
 
     /**
-     * Gets the current modifier value used to adjust the interval period.
+     * Gets the current modifier of the NanoLoop.
      *
-     * @return the modifier
+     * @return the current modifier
      */
     public float getModifier() {
         return modifier;
     }
 
     /**
-     * Gets the current task assigned to the loop.
+     * Gets the current task of the NanoLoop.
      *
-     * @return the task being executed in the loop
+     * @return the Runnable task currently set
      */
     public Runnable getTask() {
         return task;

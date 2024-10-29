@@ -13,7 +13,7 @@ A simple utility to run tasks in a loop with a specific period.
     <dependency>
         <groupId>de.MCmoderSD</groupId>
         <artifactId>executor</artifactId>
-        <version>1.0.1</version>
+        <version>1.0.2</version>
     </dependency>
 </dependencies>
 ```

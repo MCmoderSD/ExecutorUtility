@@ -6,7 +6,7 @@
 
     <groupId>de.MCmoderSD</groupId>
     <artifactId>executor</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
 
     <name>ExecutorUtility</name>
     <description>A simple utility with scheduled executors</description>
