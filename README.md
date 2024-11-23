@@ -1,21 +1,30 @@
 # ExecutorUtility
+[![](https://jitpack.io/v/MCmoderSD/ExecutorUtility.svg)](https://jitpack.io/#MCmoderSD/ExecutorUtility)
+
 
 ## Description
-
 A simple utility to run tasks in a loop with a specific period.
 
 
 ## Usage
 
 ### Maven
+Make sure you have the JitPack repository added to your `pom.xml` file:
 ```xml
-<dependencies>
-    <dependency>
-        <groupId>de.MCmoderSD</groupId>
-        <artifactId>executor</artifactId>
-        <version>1.0.2</version>
-    </dependency>
-</dependencies>
+<repositories>
+    <repository>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
+    </repository>
+</repositories>
+```
+Add the dependency to your `pom.xml` file:
+```xml
+<dependency>
+    <groupId>com.github.MCmoderSD</groupId>
+    <artifactId>executorutility</artifactId>
+    <version>1.0.2</version>
+</dependency>
 ```
 
 ### Usage Example
