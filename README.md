@@ -22,7 +22,7 @@ Add the dependency to your `pom.xml` file:
 ```xml
 <dependency>
     <groupId>com.github.MCmoderSD</groupId>
-    <artifactId>executorutility</artifactId>
+    <artifactId>ExecutorUtility</artifactId>
     <version>1.0.2</version>
 </dependency>
 ```
