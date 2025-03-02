@@ -1,6 +1,4 @@
 # ExecutorUtility
-[![](https://jitpack.io/v/MCmoderSD/ExecutorUtility.svg)](https://jitpack.io/#MCmoderSD/ExecutorUtility)
-
 
 ## Description
 A simple utility to run tasks in a loop with a specific period.
@@ -13,17 +11,18 @@ Make sure you have the JitPack repository added to your `pom.xml` file:
 ```xml
 <repositories>
     <repository>
-        <id>jitpack.io</id>
-        <url>https://jitpack.io</url>
+        <id>Nexus</id>
+        <name>Sonatype Nexus</name>
+        <url>https://mcmodersd.de/nexus/repository/maven-releases/</url>
     </repository>
 </repositories>
 ```
 Add the dependency to your `pom.xml` file:
 ```xml
 <dependency>
-    <groupId>com.github.MCmoderSD</groupId>
-    <artifactId>ExecutorUtility</artifactId>
-    <version>1.0.2</version>
+    <groupId>de.MCmoderSD</groupId>
+    <artifactId>Executor</artifactId>
+    <version>1.1.0</version>
 </dependency>
 ```
 
